@@ -7,7 +7,8 @@
 
 #include <memory>
 
-// Extracts quadratic equations from input buffer and prints them to the screen
+// Extracts quadratic equations from the input buffer and
+// prints them to the screen
 class QuadPrinter:
         public ProducerConsumer
 {
@@ -16,11 +17,11 @@ public:
                             inputBuf);
     virtual ~QuadPrinter();
 
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void stopLater() override;
 
 private:
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void worker() override;
 
     // Print quadratic equation in the next format:

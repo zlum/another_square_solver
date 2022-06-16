@@ -5,34 +5,36 @@
 #include "producerconsumer/buffer.hpp"
 #include "quadtypes.h"
 
+#include <cstddef>
 #include <memory>
+#include <stdexcept>
 
 class BigNumberBuilder;
 
-// Read coefficients from cli, store tasks and write them to output buffer
+// Reads coefficients from cli, stores tasks and
+// writes them to the output buffer
 class QuadReader:
         public ProducerConsumer
 {
 public:
     explicit QuadReader(int argc, char* argv[],
                         std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>>
-                            outputBuf,
-                        std::unique_ptr<BigNumberBuilder> coeffBuilder);
+                            outputBuf);
     virtual ~QuadReader();
 
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void stopLater() override;
 
 private:
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void worker() override;
 
     // Read coefficients of quadratic equation from cli arguments
-    std::unique_ptr<QuadCoeffs> readCoeffs(size_t& arg, size_t& pos);
+    std::unique_ptr<QuadCoeffs> readCoeffs(size_t arg);
 
 private:
-    int _argc;
+    size_t _argc;
     char** _argv;
     std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>> _buf;
-    std::unique_ptr<BigNumberBuilder> _builder;
+    static constexpr int _coeffsNumber = 3;
 };

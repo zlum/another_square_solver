@@ -7,8 +7,8 @@
 
 #include <memory>
 
-// Reads coefficients from input buffer, calc roots and writes
-// solution to output buffer
+// Reads coefficients from the input buffer, calc roots and
+// writes solution to the output buffer
 class QuadSolver:
         public ProducerConsumer
 {
@@ -19,20 +19,21 @@ public:
                             outputBuf);
     virtual ~QuadSolver();
 
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void stopLater() override;
 
 private:
-    // ProducerConsumer
+    // ProducerConsumer override
     virtual void worker() override;
 
     // Calculate one root
-    static BigNumber calcRoot(const BigNumber& sqrtDsc, bool isNegative,
-                              const BigNumber& a, const BigNumber& b);
+    static double calcRoot(double sqrtDsc, bool isNegative, int a, int b);
 
     // Calculate roots of quadratic equation
     // Using NaN as no root mark
     static QuadRoots calcRoots(const QuadCoeffs& coeffs);
+    // TODO: Comment
+    static QuadExtremum calcExtremum(const QuadCoeffs& coeffs);
 
 private:
     std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>> _inputBuf;

@@ -4,7 +4,6 @@
 #include <limits>
 #include <utility>
 
-using namespace bigNumber;
 using namespace std;
 
 QuadSolver::QuadSolver(shared_ptr<Buffer<unique_ptr<QuadCoeffs>>> inputBuf,
@@ -49,6 +48,7 @@ void QuadSolver::worker()
 
         equation->coeffs = move(*coeffs);
         equation->roots = calcRoots(equation->coeffs);
+        equation->extremum = calcExtremum(equation->coeffs);
 
         if(!_outputBuf->emplace(move(equation), workFlag))
         {
@@ -58,58 +58,73 @@ void QuadSolver::worker()
     }
 }
 
-BigNumber QuadSolver::calcRoot(const BigNumber& sqrtDsc, bool isNegative,
-                               const BigNumber& a, const BigNumber& b)
+double QuadSolver::calcRoot(double sqrtDsc, bool isNegative, int a, int b)
 {
-    // Create static object to use as integer literal
-    static const BigNumber Big2{"2"};
-
-    return (-b + (isNegative ? -sqrtDsc : sqrtDsc)) / (Big2 * a);
+    return (-b + (isNegative ? -sqrtDsc : sqrtDsc)) / (2 * a);
 }
 
 QuadRoots QuadSolver::calcRoots(const QuadCoeffs& coeffs)
 {
-    // Create static object to use as integer literal
-    static const BigNumber Big4{"4"};
-    static const BigNumber BigNaN{Sign::positive, Status::nan};
-
     // Get aliases for convenience
-    const BigNumber& a = coeffs.at(0);
-    const BigNumber& b = coeffs.at(1);
-    const BigNumber& c = coeffs.at(2);
+    const int& a = coeffs.at(0);
+    const int& b = coeffs.at(1);
+    const int& c = coeffs.at(2);
 
     // Check if it is a quadratic equation
-    if(a.isZero())
+    if(a == 0)
     {
-        if(b.isZero())
+        if(b == 0)
         {
             // Both x coefficients are zero
-            return {BigNaN, BigNaN};
+            return
+            {
+                numeric_limits<double>::quiet_NaN(),
+                numeric_limits<double>::quiet_NaN()
+            };
         }
 
         // Calc as simple bx + c = 0 equation
-        return {b / -c, BigNaN};
+        return {b / -c, numeric_limits<double>::quiet_NaN()};
     }
 
-    BigNumber discriminant = (b * b) - (Big4 * a * c);
+    auto discriminant = double((b * b) - (4 * a * c));
 
-    // Determines root count by discriminant sign
-    if(!discriminant.isZero() && discriminant.getSign() == Sign::positive)
+    // Determines roots count by discriminant sign
+    if(discriminant != FP_ZERO && discriminant > FP_ZERO)
     {
         // Two roots
-        BigNumber sqrtDsc = discriminant.sqrt();
+        double sqrtDsc = sqrt(discriminant);
 
-        return {calcRoot(sqrtDsc, true, a, b),
-                calcRoot(sqrtDsc, false, a, b)};
+        return
+        {
+            calcRoot(sqrtDsc, true, a, b),
+            calcRoot(sqrtDsc, false, a, b)
+        };
     }
 
-    if(discriminant.isZero())
+    if(discriminant == FP_ZERO)
     {
         // One root
-        return {calcRoot(discriminant.sqrt(), false, a, b),
-                BigNaN};
+        return
+        {
+            calcRoot(sqrt(discriminant), false, a, b),
+            numeric_limits<double>::quiet_NaN()
+        };
     }
 
     // No roots
-    return {BigNaN, BigNaN};
+    return
+    {
+        numeric_limits<double>::quiet_NaN(),
+        numeric_limits<double>::quiet_NaN()
+    };
+}
+
+QuadExtremum QuadSolver::calcExtremum(const QuadCoeffs& coeffs)
+{
+    // Get aliases for convenience
+    const int& a = coeffs.at(0);
+    const int& b = coeffs.at(1);
+
+    return double(-b) / (2 * a);
 }

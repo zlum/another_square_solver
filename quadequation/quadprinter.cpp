@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iostream>
 
-using namespace bigNumber;
 using namespace std;
 
 QuadPrinter::QuadPrinter(shared_ptr<Buffer<unique_ptr<QuadEquation>>> inputBuf):
@@ -48,28 +47,37 @@ void QuadPrinter::printQuadEquation(const QuadEquation& equation)
     cout << '('
          << equation.coeffs.at(0) << ' '
          << equation.coeffs.at(1) << ' '
-         << equation.coeffs.at(2) << ") => ";
+         << equation.coeffs.at(2)
+         << ") => ";
 
     // Print roots
     // Using NaN as no root mark
-    if(equation.roots.first.getStatus() == Status::nan)
+    if(isnan(equation.roots.first))
     {
         cout << "no roots" << endl;
     }
     else
-    if(equation.roots.second.getStatus() == Status::nan)
+    if(isnan(equation.roots.second))
     {
         // One root
-        cout << '('
-             << equation.roots.first.round() << ')'
-             << endl;
+        cout << "root "
+             << '('
+             << equation.roots.first
+             << ')';
     }
     else
     {
         // Two roots
-        cout << '('
-             << equation.roots.first.round() << ", "
-             << equation.roots.second.round() << ')'
-             << endl;
+        cout << "roots "
+             << '('
+             << equation.roots.first << ", "
+             << equation.roots.second
+             << "), ";
     }
+
+    // Print extremum
+    cout << "extremum "
+         << '('
+         << equation.extremum << ')'
+         << endl;
 }

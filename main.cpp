@@ -1,4 +1,3 @@
-#include "bignumber/bignumberbuilder.h"
 #include "producerconsumer/buffer.hpp"
 #include "quadequation/quadprinter.h"
 #include "quadequation/quadreader.h"
@@ -32,18 +31,14 @@ int main(int argc, char* argv[])
     auto begin = chrono::high_resolution_clock::now();
 #endif // DBG_SHOW_ELAPSED
 
-    // Create shared buffer objects to transmit tasks
+    // Create shared buffer objects to transfer tasks
     // from producers to consumers
     auto bufCoeffs = make_shared<Buffer<unique_ptr<QuadCoeffs>>>();
     auto bufEquation = make_shared<Buffer<unique_ptr<QuadEquation>>>();
 
-    // Create unique builder for QuadReader
-    // Pointer may be replaced with interface
-    auto builderCoeff = make_unique<BigNumberBuilder>();
-
     // Create ProducerConsumer instances to read, solve and print
     // quadratic equations
-    QuadReader reader(argc, argv, bufCoeffs, move(builderCoeff));
+    QuadReader reader(argc, argv, bufCoeffs);
     QuadSolver solver1(bufCoeffs, bufEquation);
 //    QuadSolver solver2(bufCoeffs, bufEquation);
     QuadPrinter printer(bufEquation);
