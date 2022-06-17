@@ -32,8 +32,7 @@ void QuadSolver::worker()
 {
     const bool& workFlag = getWorkFlag();
 
-    // Breaks if stopLater() is called
-    while(workFlag)
+    while(true)
     {
         try
         {
@@ -83,7 +82,7 @@ QuadRoots QuadSolver::calcRoots(const QuadCoeffs& coeffs)
         }
 
         // Calc as simple bx + c = 0 equation
-        return {b / -c, numeric_limits<double>::quiet_NaN()};
+        return {double(b) / -c, numeric_limits<double>::quiet_NaN()};
     }
 
     auto discriminant = double((b * b) - (4 * a * c));

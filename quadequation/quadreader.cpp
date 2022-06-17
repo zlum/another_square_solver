@@ -33,10 +33,8 @@ void QuadReader::worker()
 {
     // Read 3 values per step. Skip argv[0] cause it is working directory
     size_t argNum = 1;
-    const bool& workFlag = getWorkFlag();
 
-    // Return if all arguments has been read or stopLater() is called
-    while((argNum + _coeffsNumber < _argc + 1) && workFlag)
+    while(argNum + _coeffsNumber < _argc + 1)
     {
         try
         {
@@ -44,9 +42,11 @@ void QuadReader::worker()
         }
         catch(const invalid_argument&)
         {
+            // Skip all three arguments if one of them is invalid
         }
         catch(const out_of_range&)
         {
+            // Skip all three arguments if one of them is out of range
         }
         catch(const BufferOperationInterrupted&)
         {

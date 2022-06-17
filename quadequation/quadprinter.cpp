@@ -26,10 +26,7 @@ void QuadPrinter::stopLater()
 
 void QuadPrinter::worker()
 {
-    const bool& workFlag = getWorkFlag();
-
-    // Breaks if stopLater() is called
-    while(workFlag)
+    while(true)
     {
         try
         {
@@ -57,7 +54,7 @@ void QuadPrinter::printQuadEquation(const QuadEquation& equation)
     // Using NaN as no root mark
     if(isnan(equation.roots.first))
     {
-        cout << "no roots" << endl;
+        cout << "no roots";
     }
     else
     if(isnan(equation.roots.second))
@@ -75,12 +72,17 @@ void QuadPrinter::printQuadEquation(const QuadEquation& equation)
              << '('
              << equation.roots.first << ", "
              << equation.roots.second
-             << "), ";
+             << ')';
     }
 
     // Print extremum
-    cout << "extremum "
-         << '('
-         << equation.extremum << ')'
-         << endl;
+    if(!isnan(equation.extremum))
+    {
+        cout << ", extremum "
+             << '('
+             << equation.extremum
+             << ')';
+    }
+
+    cout << endl;
 }
