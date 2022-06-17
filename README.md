@@ -1,4 +1,4 @@
-# square_solver
+# another_square_solver
 Consumer-Produser based solver of quadratic equations
 
 Working Cycle:
@@ -16,14 +16,11 @@ Execute next commands in project directory:
 
 Run:
 --------------------------------------------------------------------------------
-Program can read any sequence numbers sepparated by space.
+Program can read any sequence of integer numbers sepparated by space.
 Any other symbols or numbers out of boundaries will be ignored.
 
 Manual input:
-* ./square_solver 1.32 -44 8
-
-File input (there is a sample file into build directory):
-* ./square_solver "$(< inputsample)"
+* ./another_square_solver 4 2 -1
 
 Output sample:
-* (1.32 -44 8) => (0.182820886110124552153889643102, 33.150512447223208781179443690232)
+* (4 2 -1) => roots (-0.809017, 0.309017), extremum (-0.25)
