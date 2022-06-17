@@ -35,22 +35,20 @@ void QuadSolver::worker()
 
     while(true)
     {
-        unique_ptr<QuadCoeffs> coeffs = _inputBuf->getAndPop(workFlag);
-
-        if(coeffs == nullptr)
+        try
         {
-            // Interrupt called
-            break;
+            unique_ptr<QuadCoeffs> coeffs = _inputBuf->getAndPop(workFlag);
+
+            // Create equation
+            auto equation = make_unique<QuadEquation>();
+
+            equation->coeffs = move(*coeffs);
+            equation->roots = calcRoots(equation->coeffs);
+            equation->extremum = calcExtremum(equation->coeffs);
+
+            _outputBuf->emplace(move(equation), workFlag);
         }
-
-        // Create equation
-        auto equation = make_unique<QuadEquation>();
-
-        equation->coeffs = move(*coeffs);
-        equation->roots = calcRoots(equation->coeffs);
-        equation->extremum = calcExtremum(equation->coeffs);
-
-        if(!_outputBuf->emplace(move(equation), workFlag))
+        catch(const BufferOperationInterrupted&)
         {
             // Interrupt called
             break;

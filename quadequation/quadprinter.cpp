@@ -29,15 +29,16 @@ void QuadPrinter::worker()
     // Returns if stopLater() had been called and input buffer is empty
     while(true)
     {
-        unique_ptr<QuadEquation> equation = _buf->getAndPop(getWorkFlag());
-
-        if(equation == nullptr)
+        try
+        {
+            unique_ptr<QuadEquation> equation = _buf->getAndPop(getWorkFlag());
+            printQuadEquation(*equation);
+        }
+        catch(const BufferOperationInterrupted&)
         {
             // Interrupt called
             break;
         }
-
-        printQuadEquation(*equation);
     }
 }
 

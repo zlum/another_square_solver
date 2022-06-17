@@ -9,8 +9,6 @@
 #include <memory>
 #include <stdexcept>
 
-class BigNumberBuilder;
-
 // Reads coefficients from cli, stores tasks and
 // writes them to the output buffer
 class QuadReader:

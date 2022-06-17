@@ -41,6 +41,7 @@ void QuadReader::worker()
         try
         {
             coeffs = readCoeffs(arg);
+            _buf->emplace(move(coeffs), getWorkFlag());
         }
         catch(const invalid_argument&)
         {
@@ -48,8 +49,11 @@ void QuadReader::worker()
         catch(const out_of_range&)
         {
         }
-
-        _buf->emplace(move(coeffs), getWorkFlag());
+        catch(const BufferOperationInterrupted&)
+        {
+            // Interrupt called
+            break;
+        }
 
         arg += _coeffsNumber; // Go to the next coefficients
     }

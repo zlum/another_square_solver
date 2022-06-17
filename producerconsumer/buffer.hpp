@@ -6,6 +6,8 @@
 #include <queue>
 #include <utility>
 
+class BufferOperationInterrupted: public std::exception{};
+
 // Thread-safe task queue
 template<typename Task>
 class Buffer
@@ -18,7 +20,7 @@ public:
     // Must be used after work flag change to interrupt operations
     void notifyAll();
     // Thread-safely adds task to the queue
-    bool emplace(Task&& task, const bool& workFlag);
+    void emplace(Task&& task, const bool& workFlag);
     // Thread-safely gets front element and pops the queue
     Task getAndPop(const bool& workFlag);
 
@@ -43,18 +45,18 @@ void Buffer<Task>::notifyAll()
 }
 
 template<typename Task>
-bool Buffer<Task>::emplace(Task&& task, const bool& workFlag)
+void Buffer<Task>::emplace(Task&& task, const bool& workFlag)
 {
     std::unique_lock<std::mutex> lock(_queueMtx);
 
-    // Hold thread if task limit had been reached
+    // Hold thread if tasks limit has been reached
     while(_taskQueue.size() >= _queueMaxSize)
     {
         // Interrupt operation if work flag is false
         if(!workFlag)
         {
             // Interrupt called. New tasks cannot be added
-            return false;
+            throw BufferOperationInterrupted{};
         }
 
         // Wait notification from getAndPop() or notifyAll()
@@ -65,8 +67,6 @@ bool Buffer<Task>::emplace(Task&& task, const bool& workFlag)
     lock.unlock();
     // Notify thread holded into getAndPop()
     _queueEmptyCondVar.notify_one();
-
-    return true;
 }
 
 template<typename Task>
@@ -80,7 +80,7 @@ Task Buffer<Task>::getAndPop(const bool& workFlag)
         if(!workFlag)
         {
             // Interrupt called
-            return nullptr;
+            throw BufferOperationInterrupted{};
         }
 
         // Wait notification from getAndPop() or notifyAll()
