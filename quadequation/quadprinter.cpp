@@ -5,7 +5,7 @@
 
 using namespace std;
 
-QuadPrinter::QuadPrinter(shared_ptr<Buffer<unique_ptr<QuadEquation>>> inputBuf):
+QuadPrinter::QuadPrinter(shared_ptr<Buffer<QuadEquation>> inputBuf):
     _buf(move(inputBuf))
 {
 }
@@ -20,19 +20,21 @@ void QuadPrinter::stopLater()
 {
     // Set work flag as false
     ProducerConsumer::stopLater();
-    // Ware threads up to interrupt buffer operations
+    // Wake threads up to interrupt buffer operations
     _buf->notifyAll();
 }
 
 void QuadPrinter::worker()
 {
-    // Returns if stopLater() had been called and input buffer is empty
-    while(true)
+    const bool& workFlag = getWorkFlag();
+
+    // Breaks if stopLater() is called
+    while(workFlag)
     {
         try
         {
-            unique_ptr<QuadEquation> equation = _buf->getAndPop(getWorkFlag());
-            printQuadEquation(*equation);
+            QuadEquation equation = _buf->getAndPop(getWorkFlag());
+            printQuadEquation(equation);
         }
         catch(const BufferOperationInterrupted&)
         {

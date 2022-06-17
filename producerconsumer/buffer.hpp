@@ -6,9 +6,10 @@
 #include <queue>
 #include <utility>
 
+// Exception class used in Buffer class to indicate interruption of operation
 class BufferOperationInterrupted: public std::exception{};
 
-// Thread-safe task queue
+// Thread-safe queue wrapper
 template<typename Task>
 class Buffer
 {
@@ -16,16 +17,16 @@ public:
     explicit Buffer() = default;
     ~Buffer() = default;
 
-    // Wakes up every thread
-    // Must be used after work flag change to interrupt operations
+    // Wake up every thread
+    // Must be used after if work flag state get changed
     void notifyAll();
-    // Thread-safely adds task to the queue
+    // Thread-safely add task to the queue
     void emplace(Task&& task, const bool& workFlag);
-    // Thread-safely gets front element and pops the queue
+    // Thread-safely get front element and pop the queue
     Task getAndPop(const bool& workFlag);
 
 private:
-    // Task queue
+    // Main container
     std::queue<Task> _taskQueue;
     // Mutex for every queue modification
     std::mutex _queueMtx;
@@ -87,7 +88,7 @@ Task Buffer<Task>::getAndPop(const bool& workFlag)
         _queueEmptyCondVar.wait(lock);
     }
 
-    Task val = move(_taskQueue.front());
+    Task val = std::move(_taskQueue.front());
     _taskQueue.pop();
     lock.unlock();
     // Notify thread holded into emplace()

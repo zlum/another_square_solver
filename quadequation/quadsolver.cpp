@@ -6,8 +6,8 @@
 
 using namespace std;
 
-QuadSolver::QuadSolver(shared_ptr<Buffer<unique_ptr<QuadCoeffs>>> inputBuf,
-                       shared_ptr<Buffer<unique_ptr<QuadEquation>>> outputBuf):
+QuadSolver::QuadSolver(shared_ptr<Buffer<QuadCoeffs>> inputBuf,
+                       shared_ptr<Buffer<QuadEquation>> outputBuf):
     _inputBuf(move(inputBuf)),
     _outputBuf(move(outputBuf))
 {
@@ -23,28 +23,29 @@ void QuadSolver::stopLater()
 {
     // Set work flag as false
     ProducerConsumer::stopLater();
-    // Ware threads up to interrupt buffer operations
+    // Wake threads up to interrupt buffer operations
     _inputBuf->notifyAll();
     _outputBuf->notifyAll();
 }
 
 void QuadSolver::worker()
 {
-    // Returns if stopLater() had been called and input buffer is empty
     const bool& workFlag = getWorkFlag();
 
-    while(true)
+    // Breaks if stopLater() is called
+    while(workFlag)
     {
         try
         {
-            unique_ptr<QuadCoeffs> coeffs = _inputBuf->getAndPop(workFlag);
+            QuadCoeffs coeffs = _inputBuf->getAndPop(workFlag);
 
             // Create equation
-            auto equation = make_unique<QuadEquation>();
-
-            equation->coeffs = move(*coeffs);
-            equation->roots = calcRoots(equation->coeffs);
-            equation->extremum = calcExtremum(equation->coeffs);
+            QuadEquation equation
+            {
+                coeffs,
+                calcRoots(coeffs),
+                calcExtremum(coeffs)
+            };
 
             _outputBuf->emplace(move(equation), workFlag);
         }

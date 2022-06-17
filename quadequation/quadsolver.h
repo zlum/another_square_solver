@@ -13,10 +13,8 @@ class QuadSolver:
         public ProducerConsumer
 {
 public:
-    explicit QuadSolver(std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>>
-                            inputBuf,
-                        std::shared_ptr<Buffer<std::unique_ptr<QuadEquation>>>
-                            outputBuf);
+    explicit QuadSolver(std::shared_ptr<Buffer<QuadCoeffs>> inputBuf,
+                        std::shared_ptr<Buffer<QuadEquation>> outputBuf);
     virtual ~QuadSolver();
 
     // ProducerConsumer override
@@ -32,10 +30,10 @@ private:
     // Calculate roots of quadratic equation
     // Using NaN as no root mark
     static QuadRoots calcRoots(const QuadCoeffs& coeffs);
-    // TODO: Comment
+    // Calculate extremum of quadratic equation
     static QuadExtremum calcExtremum(const QuadCoeffs& coeffs);
 
 private:
-    std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>> _inputBuf;
-    std::shared_ptr<Buffer<std::unique_ptr<QuadEquation>>> _outputBuf;
+    std::shared_ptr<Buffer<QuadCoeffs>> _inputBuf;
+    std::shared_ptr<Buffer<QuadEquation>> _outputBuf;
 };

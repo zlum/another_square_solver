@@ -15,9 +15,9 @@ class QuadReader:
         public ProducerConsumer
 {
 public:
-    explicit QuadReader(int argc, char* argv[],
-                        std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>>
-                            outputBuf);
+    explicit QuadReader(int argc,
+                        char* argv[],
+                        std::shared_ptr<Buffer<QuadCoeffs>> outputBuf);
     virtual ~QuadReader();
 
     // ProducerConsumer override
@@ -28,11 +28,11 @@ private:
     virtual void worker() override;
 
     // Read coefficients of quadratic equation from cli arguments
-    std::unique_ptr<QuadCoeffs> readCoeffs(size_t arg);
+    QuadCoeffs readCoeffs(size_t argNum);
 
 private:
     size_t _argc;
     char** _argv;
-    std::shared_ptr<Buffer<std::unique_ptr<QuadCoeffs>>> _buf;
+    std::shared_ptr<Buffer<QuadCoeffs>> _buf;
     static constexpr int _coeffsNumber = 3;
 };
