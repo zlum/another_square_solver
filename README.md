@@ -19,7 +19,7 @@ Run:
 Program can read any sequence of integer numbers sepparated by space.
 Any other symbols or numbers out of boundaries will be ignored.
 
-Manual input:
+Input sample:
 * ./another_square_solver 4 2 -1
 
 Output sample:
